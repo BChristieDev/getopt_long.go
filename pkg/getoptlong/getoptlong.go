@@ -37,6 +37,7 @@ func init() {
 func errInvalidOpt(opt int, errMsg string) int {
 	OptInd++
 	OptOpt = opt
+	nextchar = 0
 
 	if OptErr != 0 {
 		fmt.Fprintln(os.Stderr, errMsg)
