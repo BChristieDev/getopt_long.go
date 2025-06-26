@@ -1,0 +1,53 @@
+#! /usr/bin/env bash
+
+# @file        scripts/release
+# @author      Brandon Christie <bchristie.dev@gmail.com>
+
+cd "${0%/*}/.." || exit
+
+function main()
+{
+    local version=$(git tag | tail -1)
+    local major minor patch rest tidied
+
+    [[ -z $(git status --porcelain) ]] || exit
+
+    go test -v ./... || exit
+
+    version=${version:1}
+    IFS=. read -r major minor patch rest <<<"$version"
+
+    case "$1" in
+        major)
+            ((major++))
+            minor=0
+            patch=0
+            ;;
+        minor)
+            ((minor++))
+            patch=0
+            ;;
+        patch)
+            ((patch++))
+            ;;
+        *)
+            exit 1
+            ;;
+    esac
+
+    version="v$major.$minor.$patch"
+
+    go mod tidy
+    tidied=$(git status --porcelain go.mod)
+
+    if [[ ${tidied[0]:1:2} == "M" ]]; then
+        git add go.mod
+        git commit -m "chore: tidy go.mod for version ${version:1}"
+        git push
+    fi
+
+    git tag "$version"
+    git push origin tag "$version"
+}
+
+main "$@"

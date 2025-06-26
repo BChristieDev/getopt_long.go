@@ -1,0 +1,19 @@
+#! /usr/bin/env bash
+
+# @file        scripts/publish
+# @author      Brandon Christie <bchristie.dev@gmail.com>
+
+cd "${0%/*}/.." || exit
+
+function main()
+{
+    local -r version=$(git tag | tail -1)
+
+    [[ -z $(git status --porcelain) ]] || exit
+
+    go test -v ./... || exit
+
+    GOPROXY=proxy.golang.org go list -m "github.com/BChristieDev/getopt_long.go@$version"
+}
+
+main "$@"
