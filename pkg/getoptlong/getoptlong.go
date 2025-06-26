@@ -147,6 +147,10 @@ func GetoptLong(argc int, argv []string, shortopts string, longopts []Option, in
 		return -1
 	}
 
+	if common.CharAt(shortopts, 0) == ":" {
+		OptErr = 0
+	}
+
 	if nextchar == 0 {
 		if argv[OptInd][0] != '-' || argv[OptInd] == "-" {
 			return -1
