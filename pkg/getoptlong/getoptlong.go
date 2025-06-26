@@ -93,7 +93,9 @@ func parseLongOpt(argc int, argv []string, longopts []Option, indexptr *int) int
 		OptInd++
 	}
 
-	*indexptr = optarrIndex
+	if indexptr != nil {
+		*indexptr = optarrIndex
+	}
 
 	isOptional := longopts[optarrIndex].HasArg == OptionalArgument
 	isRequired := longopts[optarrIndex].HasArg == RequiredArgument
