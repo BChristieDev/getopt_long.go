@@ -114,12 +114,11 @@ func parseLongOpt(argc int, argv []string, longopts []Option, indexptr *int) int
 }
 
 func parseShortOpt(argc int, argv []string, shortopts string) int {
-	opt := argv[OptInd][nextchar : nextchar+1]
-	code := int(opt[0])
-	optstrIndex := strings.Index(shortopts, opt)
+	opt := int(argv[OptInd][nextchar])
+	optstrIndex := strings.Index(shortopts, string(rune(opt)))
 
 	if optstrIndex == -1 {
-		return errInvalidOpt(code, fmt.Sprintf("invalid option -- %s", opt))
+		return errInvalidOpt(opt, fmt.Sprintf("invalid option -- %c", opt))
 	}
 
 	nextchar++
@@ -132,13 +131,13 @@ func parseShortOpt(argc int, argv []string, shortopts string) int {
 	isOptional := common.CharAt(shortopts, optstrIndex+1) == ":" && common.CharAt(shortopts, optstrIndex+2) == ":"
 	isRequired := common.CharAt(shortopts, optstrIndex+1) == ":" && common.CharAt(shortopts, optstrIndex+2) != ":"
 
-	err := parseArg(argc, argv, isOptional, isRequired, code, nextchar, fmt.Sprintf("option requires an argument -- %s", opt))
+	err := parseArg(argc, argv, isOptional, isRequired, opt, nextchar, fmt.Sprintf("option requires an argument -- %c", opt))
 
 	if err != 0 {
 		return err
 	}
 
-	return code
+	return opt
 }
 
 func GetoptLong(argc int, argv []string, shortopts string, longopts []Option, indexptr *int) int {
