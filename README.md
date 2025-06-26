@@ -3,7 +3,7 @@
     <h4>Go option parser inspired by getopt_long(3)</h4>
     <p>
         <a href="https://github.com/BChristieDev/getopt_long.go/actions/workflows/ci.yml"><img src="https://github.com/BChristieDev/getopt_long.go/actions/workflows/ci.yml/badge.svg"></a>
-        <a href="https://pkg.go.dev/github.com/BChristieDev/getopt_long.go"><img src="https://pkg.go.dev/github.com/BChristieDev/getopt_long.go.svg"></a>
+        <a href="https://pkg.go.dev/github.com/BChristieDev/getopt_long.go"><img src="https://pkg.go.dev/badge/github.com/BChristieDev/getopt_long.go.svg"></a>
     </p>
     <p>
         <a href="#install">Install</a> •
