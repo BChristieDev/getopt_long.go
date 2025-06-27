@@ -142,15 +142,15 @@ func main() {
 
 ```sh
 $ ./complex --foo --bar=bar --baz=baz --baz qux -- --quux quux
-option 'a' has argument 'undefined'
+option 'a' has argument ''
 option 'b' has argument 'bar'
 option 'c' has argument 'baz'
 option 'c' has argument 'qux'
 positional arguments: --quux quux
 
 $ ./complex --aa -bb -cc -c d -- -e e
-option 'a' has argument 'undefined'
-option 'a' has argument 'undefined'
+option 'a' has argument ''
+option 'a' has argument ''
 option 'b' has argument 'b'
 option 'c' has argument 'c'
 option 'c' has argument 'd'
@@ -161,8 +161,8 @@ option 'on' changed frob state to '1'
 option 'off' changed frob state to '0'
 
 $ ./complex --silent --foo --qux --bar
-option 'a' has argument 'undefined'
-option 'b' has argument 'undefined'
+option 'a' has argument ''
+option 'b' has argument ''
 ```
 
 ## Maintainers
