@@ -14,17 +14,44 @@ import (
 )
 
 type Option struct {
-	Name   string
+	/* Name of the long option. */
+	Name string
+	/*
+		NoArgument (or 0) if the option does not take an argument;
+		RequiredArgument (or 1) if the option requires an argument; or
+		OptionalArgument (or 2) if the option takes an optional argument.
+	*/
 	HasArg int
-	Flag   *int
-	Val    int
+	/*
+		Specifies how results are returned for a long option. If Flag is not nil, then GetoptLong
+		returns 0 and Val will be assigned to the integer Flag is pointing to, otherwise GetoptLong
+		returns Val.
+	*/
+	Flag *int
+	/* Value to return, or be assigned to the integer Flag is pointing to. */
+	Val int
 }
 
-const NoArgument, RequiredArgument, OptionalArgument int = 0, 1, 2
+const (
+	/* No argument to the option is expected. */
+	NoArgument = 0
+	/* An argument to the option is required */
+	RequiredArgument = 1
+	/* An argument to the option may be presented */
+	OptionalArgument = 2
+)
 
-var OptArg string
-var OptInd, OptErr, OptOpt int
-var nextchar int
+var (
+	/* Stores the argument of an option. */
+	OptArg string
+	/* Next argument in argv array to process; default 1. */
+	OptInd int
+	/* Error reporting flag, set to 0 to suppress default error messages; default 1 */
+	OptErr int
+	/* Stores option that causes an error. */
+	OptOpt   int
+	nextchar int
+)
 
 func init() {
 	OptArg = ""
@@ -142,6 +169,17 @@ func parseShortOpt(argc int, argv []string, shortopts string) int {
 	return opt
 }
 
+/*
+If a short option is recognized the option character is returned. If a long option is recognized
+Val is returned if Flag is nil, otherwise 0 is returned and Val is assigned to the integer Flag
+is pointing to. If indexptr is not nil, then the index of the long option in longopts is assigned to
+the integer indexptr is pointing to.
+
+If an unrecognized option is encountered '?' is returned. If an option with a missing argument is
+encountered '?' is returned with OptErr is is non-zero, otherwise ':' is returned.
+
+If all options are parsed -1 is returned.
+*/
 func GetoptLong(argc int, argv []string, shortopts string, longopts []Option, indexptr *int) int {
 	if OptInd >= argc {
 		return -1
