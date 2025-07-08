@@ -8,6 +8,7 @@ package getoptlong
 import (
 	"fmt"
 	"os"
+	"path/filepath"
 	"strings"
 
 	"github.com/BChristieDev/getopt_long.go/internal/common"
@@ -101,6 +102,7 @@ func parseArg(argc int, argv []string, isOptional bool, isRequired bool, opt int
 }
 
 func parseLongOpt(argc int, argv []string, longopts []Option, indexptr *int) int {
+	progname := filepath.Base(argv[0])
 	eq := common.IndexOf(argv[OptInd], "=", 3)
 	var opt string
 
@@ -113,7 +115,7 @@ func parseLongOpt(argc int, argv []string, longopts []Option, indexptr *int) int
 	optarrIndex := common.FindIndex(longopts, func(longopt Option) bool { return longopt.Name == opt })
 
 	if optarrIndex == -1 {
-		return errInvalidOpt(0, fmt.Sprintf("unrecognized option '--%s'", opt))
+		return errInvalidOpt(0, fmt.Sprintf("%s: unrecognized option '--%s'", progname, opt))
 	}
 
 	if longopts[optarrIndex].HasArg <= NoArgument || longopts[optarrIndex].HasArg > OptionalArgument || eq == -1 {
@@ -127,7 +129,7 @@ func parseLongOpt(argc int, argv []string, longopts []Option, indexptr *int) int
 	isOptional := longopts[optarrIndex].HasArg == OptionalArgument
 	isRequired := longopts[optarrIndex].HasArg == RequiredArgument
 
-	err := parseArg(argc, argv, isOptional, isRequired, 0, eq+1, fmt.Sprintf("option '--%s' requires an argument", opt))
+	err := parseArg(argc, argv, isOptional, isRequired, 0, eq+1, fmt.Sprintf("%s: option '--%s' requires an argument", progname, opt))
 
 	if err != 0 {
 		return err
@@ -143,11 +145,12 @@ func parseLongOpt(argc int, argv []string, longopts []Option, indexptr *int) int
 }
 
 func parseShortOpt(argc int, argv []string, shortopts string) int {
+	progname := filepath.Base(argv[0])
 	opt := int(argv[OptInd][nextchar])
 	optstrIndex := strings.Index(shortopts, string(rune(opt)))
 
 	if optstrIndex == -1 {
-		return errInvalidOpt(opt, fmt.Sprintf("invalid option -- %c", opt))
+		return errInvalidOpt(opt, fmt.Sprintf("%s: invalid option -- '%c'", progname, opt))
 	}
 
 	nextchar++
@@ -160,7 +163,7 @@ func parseShortOpt(argc int, argv []string, shortopts string) int {
 	isOptional := common.CharAt(shortopts, optstrIndex+1) == ":" && common.CharAt(shortopts, optstrIndex+2) == ":"
 	isRequired := common.CharAt(shortopts, optstrIndex+1) == ":" && common.CharAt(shortopts, optstrIndex+2) != ":"
 
-	err := parseArg(argc, argv, isOptional, isRequired, opt, nextchar, fmt.Sprintf("option requires an argument -- %c", opt))
+	err := parseArg(argc, argv, isOptional, isRequired, opt, nextchar, fmt.Sprintf("%s: option requires an argument -- '%c'", progname, opt))
 
 	if err != 0 {
 		return err

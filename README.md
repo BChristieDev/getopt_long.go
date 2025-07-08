@@ -62,12 +62,12 @@ func main() {
 $ ./simple --foo bar --foo=baz --foo
 option 'foo' has argument 'bar'
 option 'foo' has argument 'baz'
-option '--foo' requires an argument
+simple: option '--foo' requires an argument
 
 $ ./simple -a foo -abar -a
 option 'a' has argument 'foo'
 option 'a' has argument 'bar'
-option requires an argument -- a
+simple: option requires an argument -- 'a'
 ```
 
 ### Complex

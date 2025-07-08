@@ -174,7 +174,7 @@ func TestLongOptions(t *testing.T) {
 	})
 
 	t.Run("Invalid option", func(t *testing.T) {
-		args := []string{"", "--foo", "bar"}
+		args := []string{"getoptlong_test.go", "--foo", "bar"}
 		r, w, _ := os.Pipe()
 		oldStderr := os.Stderr
 		longopts := []Option{
@@ -203,8 +203,8 @@ func TestLongOptions(t *testing.T) {
 				t.Errorf("opt is '%c'. Expected '?'.\n", opt)
 			}
 
-			if string(stderr) != "unrecognized option '--foo'" {
-				t.Errorf("stderr is '%s'. Expected 'unrecognized option '--foo''.\n", stderr)
+			if string(stderr) != "getoptlong_test.go: unrecognized option '--foo'" {
+				t.Errorf("stderr is '%s'. Expected 'getoptlong_test.go: unrecognized option '--foo''.\n", stderr)
 			}
 
 			if OptArg != "" {
@@ -383,7 +383,7 @@ func TestLongOptions(t *testing.T) {
 	})
 
 	t.Run("Expects required argument passed no argument", func(t *testing.T) {
-		args := []string{"", "--foo"}
+		args := []string{"getoptlong_test.go", "--foo"}
 		r, w, _ := os.Pipe()
 		oldStderr := os.Stderr
 		longopts := []Option{
@@ -412,8 +412,8 @@ func TestLongOptions(t *testing.T) {
 				t.Errorf("opt is '%c'. Expected '?'.\n", opt)
 			}
 
-			if string(stderr) != "option '--foo' requires an argument" {
-				t.Errorf("stderr is '%s'. Expected ''.\n", stderr)
+			if string(stderr) != "getoptlong_test.go: option '--foo' requires an argument" {
+				t.Errorf("stderr is '%s'. Expected 'getoptlong_test.go: option '--foo' requires an argument'.\n", stderr)
 			}
 
 			if OptArg != "" {
@@ -593,7 +593,7 @@ func TestShortOptions(t *testing.T) {
 	})
 
 	t.Run("Invalid option", func(t *testing.T) {
-		args := []string{"", "-a", "foo"}
+		args := []string{"getoptlong_test.go", "-a", "foo"}
 		r, w, _ := os.Pipe()
 		oldStderr := os.Stderr
 		longopts := []Option{
@@ -622,8 +622,8 @@ func TestShortOptions(t *testing.T) {
 				t.Errorf("opt is '%c'. Expected '?'.\n", opt)
 			}
 
-			if string(stderr) != "invalid option -- a" {
-				t.Errorf("stderr is '%s'. Expected 'invalid option -- a'.\n", stderr)
+			if string(stderr) != "getoptlong_test.go: invalid option -- 'a'" {
+				t.Errorf("stderr is '%s'. Expected 'getoptlong_test.go: invalid option -- 'a''.\n", stderr)
 			}
 
 			if OptArg != "" {
@@ -772,7 +772,7 @@ func TestShortOptions(t *testing.T) {
 	})
 
 	t.Run("Expects required argument passed no argument", func(t *testing.T) {
-		args := []string{"", "-a"}
+		args := []string{"getoptlong_test.go", "-a"}
 		r, w, _ := os.Pipe()
 		oldStderr := os.Stderr
 		longopts := []Option{
@@ -801,8 +801,8 @@ func TestShortOptions(t *testing.T) {
 				t.Errorf("opt is '%c'. Expected '?'.\n", opt)
 			}
 
-			if string(stderr) != "option requires an argument -- a" {
-				t.Errorf("stderr is '%s'. Expected 'option requires an argument -- a'.\n", stderr)
+			if string(stderr) != "getoptlong_test.go: option requires an argument -- 'a'" {
+				t.Errorf("stderr is '%s'. Expected 'getoptlong_test.go: option requires an argument -- 'a''.\n", stderr)
 			}
 
 			if OptArg != "" {
