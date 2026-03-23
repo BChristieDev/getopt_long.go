@@ -148,7 +148,7 @@ option 'c' has argument 'baz'
 option 'c' has argument 'qux'
 positional arguments: --quux quux
 
-$ ./complex --aa -bb -cc -c d -- -e e
+$ ./complex -aa -bb -cc -c d -- -e e
 option 'a' has argument ''
 option 'a' has argument ''
 option 'b' has argument 'b'
