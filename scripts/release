@@ -7,17 +7,36 @@ cd "${0%/*}/.." || exit
 
 function main()
 {
-    local version=$(git tag | tail -1)
-    local major minor patch rest tidied
-
     [[ -z $(git status --porcelain) ]] || exit
 
-    go test -v ./... || exit
+    local -r opts=$(getopt -l no-dry-run -- "$@") || exit
+    local dryRun=1
+    local version=$(git describe --tags --abbrev=0)
+    local semverType major minor patch tidy
 
-    version=${version:1}
-    IFS=. read -r major minor patch rest <<<"$version"
+    eval set -- "$opts"
 
-    case "$1" in
+    while true; do
+        case "$1" in
+            --no-dry-run) dryRun=; shift ;;
+            --) shift; break ;;
+            *) break ;;
+        esac
+
+        shift
+    done
+
+    semverType=${1?"Error: must specify semver type"}
+
+    if [[ -z $dryRun ]]; then
+        go test -v ./... || exit
+    else
+        echo "[DRY RUN]: would have run go tests"
+    fi
+
+    IFS=. read -r major minor patch <<<"${version:1}"
+
+    case "$semverType" in
         major)
             ((major++))
             minor=0
@@ -31,23 +50,32 @@ function main()
             ((patch++))
             ;;
         *)
+            echo "Error: $semverType is not a valid semver type" >&2
             exit 1
             ;;
     esac
 
     version="v$major.$minor.$patch"
 
-    go mod tidy
-    tidied=$(git status --porcelain go.mod)
+    if [[ -z $dryRun ]]; then
+        go mod tidy
+        tidy=$(git status --porcelain go.mod)
 
-    if [[ ${tidied[0]:1:2} == "M" ]]; then
-        git add go.mod
-        git commit -m "chore: tidy go.mod for version ${version:1}"
-        git push
+        if [[ ${tidy[0]:1:2} == "M" ]]; then
+            git add go.mod
+            git commit -m "chore: tidy go.mod for version ${version:1}"
+            git push
+        fi
+    else
+        echo "[DRY RUN]: would have tidied go.mod"
     fi
 
-    git tag "$version"
-    git push origin tag "$version"
+    if [[ -z $dryRun ]]; then
+        git tag -a "$version" -m "release: version ${version:1}"
+        git push origin tag "$version"
+    else
+        echo "[DRY RUN]: would have created tag: $version"
+    fi
 }
 
 main "$@"
