@@ -7,9 +7,9 @@ cd "${0%/*}/.." || exit
 
 function main()
 {
-    local -r version=$(git tag | tail -1)
-
     [[ -z $(git status --porcelain) ]] || exit
+
+    local -r version=$(git describe --tags --abbrev=0)
 
     go test -v ./... || exit
 
