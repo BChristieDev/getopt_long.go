@@ -22,8 +22,6 @@ function main()
             --) shift; break ;;
             *) break ;;
         esac
-
-        shift
     done
 
     semverType=${1?"Error: must specify semver type"}
