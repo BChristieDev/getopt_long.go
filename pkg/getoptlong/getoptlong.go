@@ -159,9 +159,9 @@ func parseShortOpt(argc int, argv []string, shortopts string) int {
 	}
 
 	if common.CharAt(shortopts, optstrind+1) == ":" && common.CharAt(shortopts, optstrind+2) == ":" {
-		hasArg = RequiredArgument
-	} else if common.CharAt(shortopts, optstrind+1) == ":" && common.CharAt(shortopts, optstrind+2) != ":" {
 		hasArg = OptionalArgument
+	} else if common.CharAt(shortopts, optstrind+1) == ":" && common.CharAt(shortopts, optstrind+2) != ":" {
+		hasArg = RequiredArgument
 	} else {
 		hasArg = NoArgument
 	}
