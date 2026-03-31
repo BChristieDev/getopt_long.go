@@ -44,23 +44,15 @@ const (
 
 var (
 	/* Stores the argument of an option. */
-	OptArg string
-	/* Next argument in argv array to process; default 1. */
-	OptInd int
-	/* Error reporting flag, set to 0 to suppress default error messages; default 1 */
-	OptErr int
-	/* Stores option that causes an error. */
-	OptOpt   int
-	nextchar int
-)
-
-func init() {
 	OptArg = ""
+	/* Next argument in argv array to process; default 1. */
 	OptInd = 1
+	/* Error reporting flag, set to 0 to suppress default error messages; default 1 */
 	OptErr = 1
-	OptOpt = 0
+	/* Stores option that causes an error. */
+	OptOpt   = 0
 	nextchar = 0
-}
+)
 
 func errInvalidOpt(optopt int, errMsg string) int {
 	OptInd++
