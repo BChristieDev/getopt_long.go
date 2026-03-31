@@ -3,7 +3,7 @@
 # @file        scripts/release
 # @author      Brandon Christie <bchristie.dev@gmail.com>
 
-cd "${0%/*}/.." || exit
+cd "$(dirname "$0")/.." || exit
 
 function main()
 {
