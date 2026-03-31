@@ -9,7 +9,7 @@ function main()
 {
     [[ -z $(git status --porcelain) ]] || exit
 
-    local -r opts=$(getopt -l no-dry-run -- "$@") || exit
+    local -r opts=$(getopt -o "" -l "no-dry-run" -- "$@") || exit
     local dryRun=1
     local version=$(git describe --tags --abbrev=0)
     local semverType major minor patch tidy
