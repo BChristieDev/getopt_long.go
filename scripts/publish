@@ -3,13 +3,13 @@
 # @file        scripts/publish
 # @author      Brandon Christie <bchristie.dev@gmail.com>
 
-cd "$(dirname "$0")/.." || exit
+cd "${ dirname "$0"; }/.." || exit
 
 function main()
 {
-    [[ -z $(git status --porcelain) ]] || exit
+    [[ -z ${ git status --porcelain; } ]] || exit
 
-    local -r version=$(git describe --tags --abbrev=0)
+    local -r version=${ git describe --tags --abbrev=0; }
 
     go test -v ./... || exit
 

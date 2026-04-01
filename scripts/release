@@ -3,15 +3,15 @@
 # @file        scripts/release
 # @author      Brandon Christie <bchristie.dev@gmail.com>
 
-cd "$(dirname "$0")/.." || exit
+cd "${ dirname "$0"; }/.." || exit
 
 function main()
 {
-    [[ -z $(git status --porcelain) ]] || exit
+    [[ -z ${ git status --porcelain; } ]] || exit
 
-    local -r opts=$(getopt -o "" -l "no-dry-run" -- "$@") || exit
+    local -r opts=${ getopt -o "" -l "no-dry-run" -- "$@"; } || exit
     local dryRun=1
-    local version=$(git describe --tags --abbrev=0)
+    local version=${ git describe --tags --abbrev=0; }
     local semverType major minor patch tidy
 
     eval set -- "$opts"
@@ -57,7 +57,7 @@ function main()
 
     if [[ -z $dryRun ]]; then
         go mod tidy
-        tidy=$(git status --porcelain go.mod)
+        tidy=${ git status --porcelain go.mod; }
 
         if [[ ${tidy[0]:1:2} == "M" ]]; then
             git add go.mod
