@@ -9,7 +9,7 @@ import (
 	"fmt"
 	"os"
 
-	. "github.com/BChristieDev/getopt_long.go/pkg/getoptlong"
+	"github.com/BChristieDev/getopt_long.go/pkg/getoptlong"
 )
 
 func main() {
@@ -25,19 +25,19 @@ func main() {
 
 	frob_flag := frob_state.unset
 
-	longopts := []Option{
-		{Name: "foo", HasArg: NoArgument, Flag: nil, Val: 'a'},
-		{Name: "bar", HasArg: OptionalArgument, Flag: nil, Val: 'b'},
-		{Name: "baz", HasArg: RequiredArgument, Flag: nil, Val: 'c'},
-		{Name: "on", HasArg: NoArgument, Flag: &frob_flag, Val: frob_state.on},
-		{Name: "off", HasArg: NoArgument, Flag: &frob_flag, Val: frob_state.off},
-		{Name: "silent", HasArg: NoArgument, Flag: nil, Val: 's'},
+	longopts := []getoptlong.Option{
+		{Name: "foo", HasArg: getoptlong.NoArgument, Flag: nil, Val: 'a'},
+		{Name: "bar", HasArg: getoptlong.OptionalArgument, Flag: nil, Val: 'b'},
+		{Name: "baz", HasArg: getoptlong.RequiredArgument, Flag: nil, Val: 'c'},
+		{Name: "on", HasArg: getoptlong.NoArgument, Flag: &frob_flag, Val: frob_state.on},
+		{Name: "off", HasArg: getoptlong.NoArgument, Flag: &frob_flag, Val: frob_state.off},
+		{Name: "silent", HasArg: getoptlong.NoArgument, Flag: nil, Val: 's'},
 	}
 
 	var longindex, opt int
 
 	for {
-		opt = GetoptLong(len(os.Args), os.Args, "ab::c:", longopts, &longindex)
+		opt = getoptlong.Parse(len(os.Args), os.Args, "ab::c:", longopts, &longindex)
 
 		if opt == -1 {
 			break
@@ -51,18 +51,18 @@ func main() {
 		case 'b':
 			fallthrough
 		case 'c':
-			fmt.Printf("option '%c' has argument '%s'\n", opt, OptArg)
+			fmt.Printf("option '%c' has argument '%s'\n", opt, getoptlong.OptArg)
 		case 's':
-			OptErr = 0
+			getoptlong.OptErr = 0
 		}
 	}
 
-	if OptInd < len(os.Args) {
+	if getoptlong.OptInd < len(os.Args) {
 		fmt.Printf("positional arguments: ")
 
-		for OptInd < len(os.Args) {
-			fmt.Printf("%s ", os.Args[OptInd])
-			OptInd++
+		for getoptlong.OptInd < len(os.Args) {
+			fmt.Printf("%s ", os.Args[getoptlong.OptInd])
+			getoptlong.OptInd++
 		}
 
 		fmt.Printf("\n")

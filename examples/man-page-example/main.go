@@ -11,7 +11,7 @@ import (
 	"fmt"
 	"os"
 
-	. "github.com/BChristieDev/getopt_long.go/pkg/getoptlong"
+	"github.com/BChristieDev/getopt_long.go/pkg/getoptlong"
 )
 
 func main() {
@@ -22,22 +22,22 @@ func main() {
 		var this_option_optind int
 		option_index := 0
 
-		if OptInd > 0 {
-			this_option_optind = OptInd
+		if getoptlong.OptInd > 0 {
+			this_option_optind = getoptlong.OptInd
 		} else {
 			this_option_optind = 1
 		}
 
-		long_options := []Option{
-			{Name: "add", HasArg: RequiredArgument, Flag: nil, Val: 0},
-			{Name: "append", HasArg: NoArgument, Flag: nil, Val: 0},
-			{Name: "delete", HasArg: RequiredArgument, Flag: nil, Val: 0},
-			{Name: "verbose", HasArg: NoArgument, Flag: nil, Val: 0},
-			{Name: "create", HasArg: RequiredArgument, Flag: nil, Val: 'c'},
-			{Name: "file", HasArg: RequiredArgument, Flag: nil, Val: 0},
+		long_options := []getoptlong.Option{
+			{Name: "add", HasArg: getoptlong.RequiredArgument, Flag: nil, Val: 0},
+			{Name: "append", HasArg: getoptlong.NoArgument, Flag: nil, Val: 0},
+			{Name: "delete", HasArg: getoptlong.RequiredArgument, Flag: nil, Val: 0},
+			{Name: "verbose", HasArg: getoptlong.NoArgument, Flag: nil, Val: 0},
+			{Name: "create", HasArg: getoptlong.RequiredArgument, Flag: nil, Val: 'c'},
+			{Name: "file", HasArg: getoptlong.RequiredArgument, Flag: nil, Val: 0},
 		}
 
-		c = GetoptLong(len(os.Args), os.Args, "abc:d:012", long_options, &option_index)
+		c = getoptlong.Parse(len(os.Args), os.Args, "abc:d:012", long_options, &option_index)
 
 		if c == -1 {
 			break
@@ -46,8 +46,8 @@ func main() {
 		switch c {
 		case 0:
 			fmt.Printf("options %s", long_options[option_index].Name)
-			if OptArg != "" {
-				fmt.Printf(" with arg %s", OptArg)
+			if getoptlong.OptArg != "" {
+				fmt.Printf(" with arg %s", getoptlong.OptArg)
 			}
 			fmt.Printf("\n")
 		case '0':
@@ -65,20 +65,20 @@ func main() {
 		case 'b':
 			fmt.Printf("option b\n")
 		case 'c':
-			fmt.Printf("option c with value '%s'\n", OptArg)
+			fmt.Printf("option c with value '%s'\n", getoptlong.OptArg)
 		case 'd':
-			fmt.Printf("option d with value '%s'\n", OptArg)
+			fmt.Printf("option d with value '%s'\n", getoptlong.OptArg)
 		case '?':
 		default:
 			fmt.Printf("?? getopt returned character code 0%o ??\n", c)
 		}
 	}
 
-	if OptInd < len(os.Args) {
+	if getoptlong.OptInd < len(os.Args) {
 		fmt.Printf("non-option ARGV-elements: ")
-		for OptInd < len(os.Args) {
-			fmt.Printf("%s ", os.Args[OptInd])
-			OptInd++
+		for getoptlong.OptInd < len(os.Args) {
+			fmt.Printf("%s ", os.Args[getoptlong.OptInd])
+			getoptlong.OptInd++
 		}
 		fmt.Printf("\n")
 	}

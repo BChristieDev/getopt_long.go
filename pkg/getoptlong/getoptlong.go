@@ -178,7 +178,7 @@ encountered '?' is returned with OptErr is is non-zero, otherwise ':' is returne
 
 If all options are parsed -1 is returned.
 */
-func GetoptLong(argc int, argv []string, shortopts string, longopts []Option, indexptr *int) int {
+func Parse(argc int, argv []string, shortopts string, longopts []Option, indexptr *int) int {
 	if OptInd >= argc {
 		return -1
 	}

@@ -9,18 +9,18 @@ import (
 	"fmt"
 	"os"
 
-	. "github.com/BChristieDev/getopt_long.go/pkg/getoptlong"
+	"github.com/BChristieDev/getopt_long.go/pkg/getoptlong"
 )
 
 func main() {
-	longopts := []Option{
-		{Name: "foo", HasArg: RequiredArgument, Flag: nil, Val: 0},
+	longopts := []getoptlong.Option{
+		{Name: "foo", HasArg: getoptlong.RequiredArgument, Flag: nil, Val: 0},
 	}
 
 	var longindex, opt int
 
 	for {
-		opt = GetoptLong(len(os.Args), os.Args, "a:", longopts, &longindex)
+		opt = getoptlong.Parse(len(os.Args), os.Args, "a:", longopts, &longindex)
 
 		if opt == -1 {
 			break
@@ -28,9 +28,9 @@ func main() {
 
 		switch opt {
 		case 0:
-			fmt.Printf("option '%s' has argument '%s'\n", longopts[longindex].Name, OptArg)
+			fmt.Printf("option '%s' has argument '%s'\n", longopts[longindex].Name, getoptlong.OptArg)
 		case 'a':
-			fmt.Printf("option '%c' has argument '%s'\n", opt, OptArg)
+			fmt.Printf("option '%c' has argument '%s'\n", opt, getoptlong.OptArg)
 		}
 	}
 }

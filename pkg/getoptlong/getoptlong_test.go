@@ -12,31 +12,31 @@ import (
 	"strings"
 	"testing"
 
-	. "github.com/BChristieDev/getopt_long.go/pkg/getoptlong"
+	"github.com/BChristieDev/getopt_long.go/pkg/getoptlong"
 )
 
 func cleanup(t *testing.T) {
 	t.Helper()
 
-	OptArg = ""
-	OptInd = 1
-	OptErr = 1
-	OptOpt = 0
+	getoptlong.OptArg = ""
+	getoptlong.OptInd = 1
+	getoptlong.OptErr = 1
+	getoptlong.OptOpt = 0
 }
 
 func TestLongOptions(t *testing.T) {
 	t.Run("End of options delimiter", func(t *testing.T) {
 		args := []string{"", "--foo", "--", "--bar"}
-		longopts := []Option{
-			{Name: "foo", HasArg: NoArgument, Flag: nil, Val: 'f'},
-			{Name: "bar", HasArg: NoArgument, Flag: nil, Val: 'b'},
+		longopts := []getoptlong.Option{
+			{Name: "foo", HasArg: getoptlong.NoArgument, Flag: nil, Val: 'f'},
+			{Name: "bar", HasArg: getoptlong.NoArgument, Flag: nil, Val: 'b'},
 		}
 		var opt int
 
 		t.Cleanup(func() { cleanup(t) })
 
 		for {
-			opt = GetoptLong(len(args), args, "", longopts, nil)
+			opt = getoptlong.Parse(len(args), args, "", longopts, nil)
 
 			if opt == -1 {
 				break
@@ -46,28 +46,28 @@ func TestLongOptions(t *testing.T) {
 				t.Errorf("opt is '%c'. Expected 'f'.\n", opt)
 			}
 
-			if OptArg != "" {
-				t.Errorf("optarg is '%s'. Expected ''.\n", OptArg)
+			if getoptlong.OptArg != "" {
+				t.Errorf("optarg is '%s'. Expected ''.\n", getoptlong.OptArg)
 			}
 		}
 
-		if args[OptInd] != "--bar" {
-			t.Errorf("positional argument is '%s'. Expected '--bar'.\n", args[OptInd])
+		if args[getoptlong.OptInd] != "--bar" {
+			t.Errorf("positional argument is '%s'. Expected '--bar'.\n", args[getoptlong.OptInd])
 		}
 	})
 
 	t.Run("Flag", func(t *testing.T) {
 		args := []string{"", "--foo", "bar"}
 		var foo int
-		longopts := []Option{
-			{Name: "foo", HasArg: NoArgument, Flag: &foo, Val: 1},
+		longopts := []getoptlong.Option{
+			{Name: "foo", HasArg: getoptlong.NoArgument, Flag: &foo, Val: 1},
 		}
 		var opt int
 
 		t.Cleanup(func() { cleanup(t) })
 
 		for {
-			opt = GetoptLong(len(args), args, "", longopts, nil)
+			opt = getoptlong.Parse(len(args), args, "", longopts, nil)
 
 			if opt == -1 {
 				break
@@ -77,8 +77,8 @@ func TestLongOptions(t *testing.T) {
 				t.Errorf("opt is '%d'. Expected '0'.\n", opt)
 			}
 
-			if OptArg != "" {
-				t.Errorf("optarg is '%s'. Expected ''.\n", OptArg)
+			if getoptlong.OptArg != "" {
+				t.Errorf("optarg is '%s'. Expected ''.\n", getoptlong.OptArg)
 			}
 		}
 
@@ -86,25 +86,25 @@ func TestLongOptions(t *testing.T) {
 			t.Errorf("flag 'foo' is '%d'. Expected '1'.\n", foo)
 		}
 
-		if args[OptInd] != "bar" {
-			t.Errorf("positional argument is '%s'. Expected 'bar'.\n", args[OptInd])
+		if args[getoptlong.OptInd] != "bar" {
+			t.Errorf("positional argument is '%s'. Expected 'bar'.\n", args[getoptlong.OptInd])
 		}
 	})
 
 	t.Run("Index pointer", func(t *testing.T) {
 		args := []string{"", "--bar", "qux"}
 		var indexptr int
-		longopts := []Option{
-			{Name: "foo", HasArg: NoArgument, Flag: nil, Val: 0},
-			{Name: "bar", HasArg: NoArgument, Flag: nil, Val: 0},
-			{Name: "baz", HasArg: NoArgument, Flag: nil, Val: 0},
+		longopts := []getoptlong.Option{
+			{Name: "foo", HasArg: getoptlong.NoArgument, Flag: nil, Val: 0},
+			{Name: "bar", HasArg: getoptlong.NoArgument, Flag: nil, Val: 0},
+			{Name: "baz", HasArg: getoptlong.NoArgument, Flag: nil, Val: 0},
 		}
 		var opt int
 
 		t.Cleanup(func() { cleanup(t) })
 
 		for {
-			opt = GetoptLong(len(args), args, "", longopts, &indexptr)
+			opt = getoptlong.Parse(len(args), args, "", longopts, &indexptr)
 
 			if opt == -1 {
 				break
@@ -118,13 +118,13 @@ func TestLongOptions(t *testing.T) {
 				t.Errorf("indexptr is '%s'. Expected 'bar'.\n", longopts[indexptr].Name)
 			}
 
-			if OptArg != "" {
-				t.Errorf("optarg is '%s'. Expected ''.\n", OptArg)
+			if getoptlong.OptArg != "" {
+				t.Errorf("optarg is '%s'. Expected ''.\n", getoptlong.OptArg)
 			}
 		}
 
-		if args[OptInd] != "qux" {
-			t.Errorf("positional argument is '%s'. Expected 'qux'.\n", args[OptInd])
+		if args[getoptlong.OptInd] != "qux" {
+			t.Errorf("positional argument is '%s'. Expected 'qux'.\n", args[getoptlong.OptInd])
 		}
 	})
 
@@ -132,18 +132,18 @@ func TestLongOptions(t *testing.T) {
 		args := []string{"", "--foo", "bar"}
 		r, w, _ := os.Pipe()
 		oldStderr := os.Stderr
-		longopts := []Option{
-			{Name: "", HasArg: NoArgument, Flag: nil, Val: 0},
+		longopts := []getoptlong.Option{
+			{Name: "", HasArg: getoptlong.NoArgument, Flag: nil, Val: 0},
 		}
 		var opt int
 
 		t.Cleanup(func() { cleanup(t) })
 
 		os.Stderr = w
-		OptErr = 0
+		getoptlong.OptErr = 0
 
 		for {
-			opt = GetoptLong(len(args), args, "", longopts, nil)
+			opt = getoptlong.Parse(len(args), args, "", longopts, nil)
 
 			if opt == -1 {
 				break
@@ -163,13 +163,13 @@ func TestLongOptions(t *testing.T) {
 				t.Errorf("stderr is '%s'. Expected ''.\n", stderr)
 			}
 
-			if OptArg != "" {
-				t.Errorf("optarg is '%s'. Expected ''.\n", OptArg)
+			if getoptlong.OptArg != "" {
+				t.Errorf("optarg is '%s'. Expected ''.\n", getoptlong.OptArg)
 			}
 		}
 
-		if args[OptInd] != "bar" {
-			t.Errorf("positional argument is '%s'. Expected 'bar'.\n", args[OptInd])
+		if args[getoptlong.OptInd] != "bar" {
+			t.Errorf("positional argument is '%s'. Expected 'bar'.\n", args[getoptlong.OptInd])
 		}
 	})
 
@@ -177,8 +177,8 @@ func TestLongOptions(t *testing.T) {
 		args := []string{"getoptlong_test.go", "--foo", "bar"}
 		r, w, _ := os.Pipe()
 		oldStderr := os.Stderr
-		longopts := []Option{
-			{Name: "", HasArg: NoArgument, Flag: nil, Val: 0},
+		longopts := []getoptlong.Option{
+			{Name: "", HasArg: getoptlong.NoArgument, Flag: nil, Val: 0},
 		}
 		var opt int
 
@@ -187,7 +187,7 @@ func TestLongOptions(t *testing.T) {
 		os.Stderr = w
 
 		for {
-			opt = GetoptLong(len(args), args, "", longopts, nil)
+			opt = getoptlong.Parse(len(args), args, "", longopts, nil)
 
 			if opt == -1 {
 				break
@@ -207,27 +207,27 @@ func TestLongOptions(t *testing.T) {
 				t.Errorf("stderr is '%s'. Expected 'getoptlong_test.go: unrecognized option '--foo''.\n", stderr)
 			}
 
-			if OptArg != "" {
-				t.Errorf("optarg is '%s'. Expected ''.\n", OptArg)
+			if getoptlong.OptArg != "" {
+				t.Errorf("optarg is '%s'. Expected ''.\n", getoptlong.OptArg)
 			}
 		}
 
-		if args[OptInd] != "bar" {
-			t.Errorf("positional argument is '%s'. Expected 'bar'.\n", args[OptInd])
+		if args[getoptlong.OptInd] != "bar" {
+			t.Errorf("positional argument is '%s'. Expected 'bar'.\n", args[getoptlong.OptInd])
 		}
 	})
 
 	t.Run("Expects no argument passed optional argument", func(t *testing.T) {
 		args := []string{"", "--foo=bar", "baz"}
-		longopts := []Option{
-			{Name: "foo", HasArg: NoArgument, Flag: nil, Val: 0},
+		longopts := []getoptlong.Option{
+			{Name: "foo", HasArg: getoptlong.NoArgument, Flag: nil, Val: 0},
 		}
 		var opt int
 
 		t.Cleanup(func() { cleanup(t) })
 
 		for {
-			opt = GetoptLong(len(args), args, "", longopts, nil)
+			opt = getoptlong.Parse(len(args), args, "", longopts, nil)
 
 			if opt == -1 {
 				break
@@ -237,27 +237,27 @@ func TestLongOptions(t *testing.T) {
 				t.Errorf("opt is '%c'. Expected '0'.\n", opt)
 			}
 
-			if OptArg != "" {
-				t.Errorf("optarg is '%s'. Expected ''.\n", OptArg)
+			if getoptlong.OptArg != "" {
+				t.Errorf("optarg is '%s'. Expected ''.\n", getoptlong.OptArg)
 			}
 		}
 
-		if args[OptInd] != "baz" {
-			t.Errorf("positional argument is '%s'. Expected 'baz'.\n", args[OptInd])
+		if args[getoptlong.OptInd] != "baz" {
+			t.Errorf("positional argument is '%s'. Expected 'baz'.\n", args[getoptlong.OptInd])
 		}
 	})
 
 	t.Run("Expects no argument", func(t *testing.T) {
 		args := []string{"", "--foo", "bar"}
-		longopts := []Option{
-			{Name: "foo", HasArg: NoArgument, Flag: nil, Val: 0},
+		longopts := []getoptlong.Option{
+			{Name: "foo", HasArg: getoptlong.NoArgument, Flag: nil, Val: 0},
 		}
 		var opt int
 
 		t.Cleanup(func() { cleanup(t) })
 
 		for {
-			opt = GetoptLong(len(args), args, "", longopts, nil)
+			opt = getoptlong.Parse(len(args), args, "", longopts, nil)
 
 			if opt == -1 {
 				break
@@ -267,27 +267,27 @@ func TestLongOptions(t *testing.T) {
 				t.Errorf("opt is '%c'. Expected '0'.\n", opt)
 			}
 
-			if OptArg != "" {
-				t.Errorf("optarg is '%s'. Expected ''.\n", OptArg)
+			if getoptlong.OptArg != "" {
+				t.Errorf("optarg is '%s'. Expected ''.\n", getoptlong.OptArg)
 			}
 		}
 
-		if args[OptInd] != "bar" {
-			t.Errorf("positional argument is '%s'. Expected 'bar'.\n", args[OptInd])
+		if args[getoptlong.OptInd] != "bar" {
+			t.Errorf("positional argument is '%s'. Expected 'bar'.\n", args[getoptlong.OptInd])
 		}
 	})
 
 	t.Run("Expects optional argument passed no argument", func(t *testing.T) {
 		args := []string{"", "--foo", "bar"}
-		longopts := []Option{
-			{Name: "foo", HasArg: OptionalArgument, Flag: nil, Val: 0},
+		longopts := []getoptlong.Option{
+			{Name: "foo", HasArg: getoptlong.OptionalArgument, Flag: nil, Val: 0},
 		}
 		var opt int
 
 		t.Cleanup(func() { cleanup(t) })
 
 		for {
-			opt = GetoptLong(len(args), args, "", longopts, nil)
+			opt = getoptlong.Parse(len(args), args, "", longopts, nil)
 
 			if opt == -1 {
 				break
@@ -297,27 +297,27 @@ func TestLongOptions(t *testing.T) {
 				t.Errorf("opt is '%c'. Expected '0'.\n", opt)
 			}
 
-			if OptArg != "" {
-				t.Errorf("optarg is '%s'. Expected ''.\n", OptArg)
+			if getoptlong.OptArg != "" {
+				t.Errorf("optarg is '%s'. Expected ''.\n", getoptlong.OptArg)
 			}
 		}
 
-		if args[OptInd] != "bar" {
-			t.Errorf("positional argument is '%s'. Expected 'bar'.\n", args[OptInd])
+		if args[getoptlong.OptInd] != "bar" {
+			t.Errorf("positional argument is '%s'. Expected 'bar'.\n", args[getoptlong.OptInd])
 		}
 	})
 
 	t.Run("Expects optional argument passed optional argument", func(t *testing.T) {
 		args := []string{"", "--foo=bar", "baz"}
-		longopts := []Option{
-			{Name: "foo", HasArg: OptionalArgument, Flag: nil, Val: 0},
+		longopts := []getoptlong.Option{
+			{Name: "foo", HasArg: getoptlong.OptionalArgument, Flag: nil, Val: 0},
 		}
 		var opt int
 
 		t.Cleanup(func() { cleanup(t) })
 
 		for {
-			opt = GetoptLong(len(args), args, "", longopts, nil)
+			opt = getoptlong.Parse(len(args), args, "", longopts, nil)
 
 			if opt == -1 {
 				break
@@ -327,13 +327,13 @@ func TestLongOptions(t *testing.T) {
 				t.Errorf("opt is '%c'. Expected '0'.\n", opt)
 			}
 
-			if OptArg != "bar" {
-				t.Errorf("optarg is '%s'. Expected 'bar'.\n", OptArg)
+			if getoptlong.OptArg != "bar" {
+				t.Errorf("optarg is '%s'. Expected 'bar'.\n", getoptlong.OptArg)
 			}
 		}
 
-		if args[OptInd] != "baz" {
-			t.Errorf("positional argument is '%s'. Expected 'baz'.\n", args[OptInd])
+		if args[getoptlong.OptInd] != "baz" {
+			t.Errorf("positional argument is '%s'. Expected 'baz'.\n", args[getoptlong.OptInd])
 		}
 	})
 
@@ -341,18 +341,18 @@ func TestLongOptions(t *testing.T) {
 		args := []string{"", "--foo"}
 		r, w, _ := os.Pipe()
 		oldStderr := os.Stderr
-		longopts := []Option{
-			{Name: "foo", HasArg: RequiredArgument, Flag: nil, Val: 0},
+		longopts := []getoptlong.Option{
+			{Name: "foo", HasArg: getoptlong.RequiredArgument, Flag: nil, Val: 0},
 		}
 		var opt int
 
 		t.Cleanup(func() { cleanup(t) })
 
 		os.Stderr = w
-		OptErr = 0
+		getoptlong.OptErr = 0
 
 		for {
-			opt = GetoptLong(len(args), args, "", longopts, nil)
+			opt = getoptlong.Parse(len(args), args, "", longopts, nil)
 
 			if opt == -1 {
 				break
@@ -372,13 +372,13 @@ func TestLongOptions(t *testing.T) {
 				t.Errorf("stderr is '%s'. Expected ''.\n", stderr)
 			}
 
-			if OptArg != "" {
-				t.Errorf("optarg is '%s'. Expected ''.\n", OptArg)
+			if getoptlong.OptArg != "" {
+				t.Errorf("optarg is '%s'. Expected ''.\n", getoptlong.OptArg)
 			}
 		}
 
-		if args[OptInd-1] != "--foo" {
-			t.Errorf("last argument is '%s'. Expected '--foo'.\n", args[OptInd-1])
+		if args[getoptlong.OptInd-1] != "--foo" {
+			t.Errorf("last argument is '%s'. Expected '--foo'.\n", args[getoptlong.OptInd-1])
 		}
 	})
 
@@ -386,8 +386,8 @@ func TestLongOptions(t *testing.T) {
 		args := []string{"getoptlong_test.go", "--foo"}
 		r, w, _ := os.Pipe()
 		oldStderr := os.Stderr
-		longopts := []Option{
-			{Name: "foo", HasArg: RequiredArgument, Flag: nil, Val: 0},
+		longopts := []getoptlong.Option{
+			{Name: "foo", HasArg: getoptlong.RequiredArgument, Flag: nil, Val: 0},
 		}
 		var opt int
 
@@ -396,7 +396,7 @@ func TestLongOptions(t *testing.T) {
 		os.Stderr = w
 
 		for {
-			opt = GetoptLong(len(args), args, "", longopts, nil)
+			opt = getoptlong.Parse(len(args), args, "", longopts, nil)
 
 			if opt == -1 {
 				break
@@ -416,27 +416,27 @@ func TestLongOptions(t *testing.T) {
 				t.Errorf("stderr is '%s'. Expected 'getoptlong_test.go: option '--foo' requires an argument'.\n", stderr)
 			}
 
-			if OptArg != "" {
-				t.Errorf("optarg is '%s'. Expected ''.\n", OptArg)
+			if getoptlong.OptArg != "" {
+				t.Errorf("optarg is '%s'. Expected ''.\n", getoptlong.OptArg)
 			}
 		}
 
-		if args[OptInd-1] != "--foo" {
-			t.Errorf("last argument is '%s'. Expected '--foo'.\n", args[OptInd-1])
+		if args[getoptlong.OptInd-1] != "--foo" {
+			t.Errorf("last argument is '%s'. Expected '--foo'.\n", args[getoptlong.OptInd-1])
 		}
 	})
 
 	t.Run("Expects required argument passed optional argument", func(t *testing.T) {
 		args := []string{"", "--foo=bar", "baz"}
-		longopts := []Option{
-			{Name: "foo", HasArg: RequiredArgument, Flag: nil, Val: 0},
+		longopts := []getoptlong.Option{
+			{Name: "foo", HasArg: getoptlong.RequiredArgument, Flag: nil, Val: 0},
 		}
 		var opt int
 
 		t.Cleanup(func() { cleanup(t) })
 
 		for {
-			opt = GetoptLong(len(args), args, "", longopts, nil)
+			opt = getoptlong.Parse(len(args), args, "", longopts, nil)
 
 			if opt == -1 {
 				break
@@ -446,27 +446,27 @@ func TestLongOptions(t *testing.T) {
 				t.Errorf("opt is '%c'. Expected '0'.\n", opt)
 			}
 
-			if OptArg != "bar" {
-				t.Errorf("optarg is '%s'. Expected 'bar'.\n", OptArg)
+			if getoptlong.OptArg != "bar" {
+				t.Errorf("optarg is '%s'. Expected 'bar'.\n", getoptlong.OptArg)
 			}
 		}
 
-		if args[OptInd] != "baz" {
-			t.Errorf("positional argument is '%s'. Expected 'baz'.\n", args[OptInd])
+		if args[getoptlong.OptInd] != "baz" {
+			t.Errorf("positional argument is '%s'. Expected 'baz'.\n", args[getoptlong.OptInd])
 		}
 	})
 
 	t.Run("Expects required argument passed required argument", func(t *testing.T) {
 		args := []string{"", "--foo", "bar", "baz"}
-		longopts := []Option{
-			{Name: "foo", HasArg: RequiredArgument, Flag: nil, Val: 0},
+		longopts := []getoptlong.Option{
+			{Name: "foo", HasArg: getoptlong.RequiredArgument, Flag: nil, Val: 0},
 		}
 		var opt int
 
 		t.Cleanup(func() { cleanup(t) })
 
 		for {
-			opt = GetoptLong(len(args), args, "", longopts, nil)
+			opt = getoptlong.Parse(len(args), args, "", longopts, nil)
 
 			if opt == -1 {
 				break
@@ -476,27 +476,27 @@ func TestLongOptions(t *testing.T) {
 				t.Errorf("opt is '%c'. Expected '0'.\n", opt)
 			}
 
-			if OptArg != "bar" {
-				t.Errorf("optarg is '%s'. Expected 'bar'.\n", OptArg)
+			if getoptlong.OptArg != "bar" {
+				t.Errorf("optarg is '%s'. Expected 'bar'.\n", getoptlong.OptArg)
 			}
 		}
 
-		if args[OptInd] != "baz" {
-			t.Errorf("positional argument is '%s'. Expected 'baz'.\n", args[OptInd])
+		if args[getoptlong.OptInd] != "baz" {
+			t.Errorf("positional argument is '%s'. Expected 'baz'.\n", args[getoptlong.OptInd])
 		}
 	})
 
 	t.Run("Val", func(t *testing.T) {
 		args := []string{"", "--foo", "bar"}
-		longopts := []Option{
-			{Name: "foo", HasArg: NoArgument, Flag: nil, Val: 'f'},
+		longopts := []getoptlong.Option{
+			{Name: "foo", HasArg: getoptlong.NoArgument, Flag: nil, Val: 'f'},
 		}
 		var opt int
 
 		t.Cleanup(func() { cleanup(t) })
 
 		for {
-			opt = GetoptLong(len(args), args, "", longopts, nil)
+			opt = getoptlong.Parse(len(args), args, "", longopts, nil)
 
 			if opt == -1 {
 				break
@@ -506,13 +506,13 @@ func TestLongOptions(t *testing.T) {
 				t.Errorf("opt is '%c'. Expected 'f'.\n", opt)
 			}
 
-			if OptArg != "" {
-				t.Errorf("optarg is '%s'. Expected ''.\n", OptArg)
+			if getoptlong.OptArg != "" {
+				t.Errorf("optarg is '%s'. Expected ''.\n", getoptlong.OptArg)
 			}
 		}
 
-		if args[OptInd] != "bar" {
-			t.Errorf("positional argument is '%s'. Expected 'bar'.\n", args[OptInd])
+		if args[getoptlong.OptInd] != "bar" {
+			t.Errorf("positional argument is '%s'. Expected 'bar'.\n", args[getoptlong.OptInd])
 		}
 	})
 }
@@ -520,15 +520,15 @@ func TestLongOptions(t *testing.T) {
 func TestShortOptions(t *testing.T) {
 	t.Run("End of options delimiter", func(t *testing.T) {
 		args := []string{"", "-a", "--", "-b"}
-		longopts := []Option{
-			{Name: "", HasArg: NoArgument, Flag: nil, Val: 0},
+		longopts := []getoptlong.Option{
+			{Name: "", HasArg: getoptlong.NoArgument, Flag: nil, Val: 0},
 		}
 		var opt int
 
 		t.Cleanup(func() { cleanup(t) })
 
 		for {
-			opt = GetoptLong(len(args), args, "ab", longopts, nil)
+			opt = getoptlong.Parse(len(args), args, "ab", longopts, nil)
 
 			if opt == -1 {
 				break
@@ -538,13 +538,13 @@ func TestShortOptions(t *testing.T) {
 				t.Errorf("opt is '%c'. Expected '0'.\n", opt)
 			}
 
-			if OptArg != "" {
-				t.Errorf("optarg is '%s'. Expected ''.\n", OptArg)
+			if getoptlong.OptArg != "" {
+				t.Errorf("optarg is '%s'. Expected ''.\n", getoptlong.OptArg)
 			}
 		}
 
-		if args[OptInd] != "-b" {
-			t.Errorf("positional argument is '%s'. Expected '-b'.\n", args[OptInd])
+		if args[getoptlong.OptInd] != "-b" {
+			t.Errorf("positional argument is '%s'. Expected '-b'.\n", args[getoptlong.OptInd])
 		}
 	})
 
@@ -552,8 +552,8 @@ func TestShortOptions(t *testing.T) {
 		args := []string{"", "-a", "foo"}
 		r, w, _ := os.Pipe()
 		oldStderr := os.Stderr
-		longopts := []Option{
-			{Name: "", HasArg: NoArgument, Flag: nil, Val: 0},
+		longopts := []getoptlong.Option{
+			{Name: "", HasArg: getoptlong.NoArgument, Flag: nil, Val: 0},
 		}
 		var opt int
 
@@ -562,7 +562,7 @@ func TestShortOptions(t *testing.T) {
 		os.Stderr = w
 
 		for {
-			opt = GetoptLong(len(args), args, ":", longopts, nil)
+			opt = getoptlong.Parse(len(args), args, ":", longopts, nil)
 
 			if opt == -1 {
 				break
@@ -582,13 +582,13 @@ func TestShortOptions(t *testing.T) {
 				t.Errorf("stderr is '%s'. Expected ''.\n", stderr)
 			}
 
-			if OptArg != "" {
-				t.Errorf("optarg is '%s'. Expected ''.\n", OptArg)
+			if getoptlong.OptArg != "" {
+				t.Errorf("optarg is '%s'. Expected ''.\n", getoptlong.OptArg)
 			}
 		}
 
-		if args[OptInd] != "foo" {
-			t.Errorf("positional argument is '%s'. Expected 'foo'.\n", args[OptInd])
+		if args[getoptlong.OptInd] != "foo" {
+			t.Errorf("positional argument is '%s'. Expected 'foo'.\n", args[getoptlong.OptInd])
 		}
 	})
 
@@ -596,8 +596,8 @@ func TestShortOptions(t *testing.T) {
 		args := []string{"getoptlong_test.go", "-a", "foo"}
 		r, w, _ := os.Pipe()
 		oldStderr := os.Stderr
-		longopts := []Option{
-			{Name: "", HasArg: NoArgument, Flag: nil, Val: 0},
+		longopts := []getoptlong.Option{
+			{Name: "", HasArg: getoptlong.NoArgument, Flag: nil, Val: 0},
 		}
 		var opt int
 
@@ -606,7 +606,7 @@ func TestShortOptions(t *testing.T) {
 		os.Stderr = w
 
 		for {
-			opt = GetoptLong(len(args), args, "", longopts, nil)
+			opt = getoptlong.Parse(len(args), args, "", longopts, nil)
 
 			if opt == -1 {
 				break
@@ -626,28 +626,28 @@ func TestShortOptions(t *testing.T) {
 				t.Errorf("stderr is '%s'. Expected 'getoptlong_test.go: invalid option -- 'a''.\n", stderr)
 			}
 
-			if OptArg != "" {
-				t.Errorf("optarg is '%s'. Expected ''.\n", OptArg)
+			if getoptlong.OptArg != "" {
+				t.Errorf("optarg is '%s'. Expected ''.\n", getoptlong.OptArg)
 			}
 		}
 
-		if args[OptInd] != "foo" {
-			t.Errorf("positional argument is '%s'. Expected 'foo'.\n", args[OptInd])
+		if args[getoptlong.OptInd] != "foo" {
+			t.Errorf("positional argument is '%s'. Expected 'foo'.\n", args[getoptlong.OptInd])
 		}
 	})
 
 	t.Run("Expects no argument", func(t *testing.T) {
 		args := []string{"", "-abc", "foo"}
 		optstring := "abc"
-		longopts := []Option{
-			{Name: "", HasArg: NoArgument, Flag: nil, Val: 0},
+		longopts := []getoptlong.Option{
+			{Name: "", HasArg: getoptlong.NoArgument, Flag: nil, Val: 0},
 		}
 		var opt int
 
 		t.Cleanup(func() { cleanup(t) })
 
 		for {
-			opt = GetoptLong(len(args), args, optstring, longopts, nil)
+			opt = getoptlong.Parse(len(args), args, optstring, longopts, nil)
 
 			if opt == -1 {
 				break
@@ -657,27 +657,27 @@ func TestShortOptions(t *testing.T) {
 				t.Errorf("opt is '%t'. Expected 'true'.\n", strings.ContainsRune(optstring, rune(opt)))
 			}
 
-			if OptArg != "" {
-				t.Errorf("optarg is '%s'. Expected ''.\n", OptArg)
+			if getoptlong.OptArg != "" {
+				t.Errorf("optarg is '%s'. Expected ''.\n", getoptlong.OptArg)
 			}
 		}
 
-		if args[OptInd] != "foo" {
-			t.Errorf("positional argument is '%s'. Expected 'foo'.\n", args[OptInd])
+		if args[getoptlong.OptInd] != "foo" {
+			t.Errorf("positional argument is '%s'. Expected 'foo'.\n", args[getoptlong.OptInd])
 		}
 	})
 
 	t.Run("Expects optional argument passed no argument", func(t *testing.T) {
 		args := []string{"", "-a", "foo"}
-		longopts := []Option{
-			{Name: "", HasArg: NoArgument, Flag: nil, Val: 0},
+		longopts := []getoptlong.Option{
+			{Name: "", HasArg: getoptlong.NoArgument, Flag: nil, Val: 0},
 		}
 		var opt int
 
 		t.Cleanup(func() { cleanup(t) })
 
 		for {
-			opt = GetoptLong(len(args), args, "a::", longopts, nil)
+			opt = getoptlong.Parse(len(args), args, "a::", longopts, nil)
 
 			if opt == -1 {
 				break
@@ -687,27 +687,27 @@ func TestShortOptions(t *testing.T) {
 				t.Errorf("opt is '%c'. Expected 'a'.\n", opt)
 			}
 
-			if OptArg != "" {
-				t.Errorf("optarg is '%s'. Expected ''.\n", OptArg)
+			if getoptlong.OptArg != "" {
+				t.Errorf("optarg is '%s'. Expected ''.\n", getoptlong.OptArg)
 			}
 		}
 
-		if args[OptInd] != "foo" {
-			t.Errorf("positional argument is '%s'. Expected 'foo'.\n", args[OptInd])
+		if args[getoptlong.OptInd] != "foo" {
+			t.Errorf("positional argument is '%s'. Expected 'foo'.\n", args[getoptlong.OptInd])
 		}
 	})
 
 	t.Run("Expects optional argument passed optional argument", func(t *testing.T) {
 		args := []string{"", "-afoo", "bar"}
-		longopts := []Option{
-			{Name: "", HasArg: NoArgument, Flag: nil, Val: 0},
+		longopts := []getoptlong.Option{
+			{Name: "", HasArg: getoptlong.NoArgument, Flag: nil, Val: 0},
 		}
 		var opt int
 
 		t.Cleanup(func() { cleanup(t) })
 
 		for {
-			opt = GetoptLong(len(args), args, "a::", longopts, nil)
+			opt = getoptlong.Parse(len(args), args, "a::", longopts, nil)
 
 			if opt == -1 {
 				break
@@ -717,13 +717,13 @@ func TestShortOptions(t *testing.T) {
 				t.Errorf("opt is '%c'. Expected 'a'.\n", opt)
 			}
 
-			if OptArg != "foo" {
-				t.Errorf("optarg is '%s'. Expected 'foo'.\n", OptArg)
+			if getoptlong.OptArg != "foo" {
+				t.Errorf("optarg is '%s'. Expected 'foo'.\n", getoptlong.OptArg)
 			}
 		}
 
-		if args[OptInd] != "bar" {
-			t.Errorf("positional argument is '%s'. Expected 'bar'.\n", args[OptInd])
+		if args[getoptlong.OptInd] != "bar" {
+			t.Errorf("positional argument is '%s'. Expected 'bar'.\n", args[getoptlong.OptInd])
 		}
 	})
 
@@ -731,8 +731,8 @@ func TestShortOptions(t *testing.T) {
 		args := []string{"", "-a"}
 		r, w, _ := os.Pipe()
 		oldStderr := os.Stderr
-		longopts := []Option{
-			{Name: "", HasArg: NoArgument, Flag: nil, Val: 0},
+		longopts := []getoptlong.Option{
+			{Name: "", HasArg: getoptlong.NoArgument, Flag: nil, Val: 0},
 		}
 		var opt int
 
@@ -741,7 +741,7 @@ func TestShortOptions(t *testing.T) {
 		os.Stderr = w
 
 		for {
-			opt = GetoptLong(len(args), args, ":a:", longopts, nil)
+			opt = getoptlong.Parse(len(args), args, ":a:", longopts, nil)
 
 			if opt == -1 {
 				break
@@ -761,13 +761,13 @@ func TestShortOptions(t *testing.T) {
 				t.Errorf("stderr is '%s'. Expected ''.\n", stderr)
 			}
 
-			if OptArg != "" {
-				t.Errorf("optarg is '%s'. Expected ''.\n", OptArg)
+			if getoptlong.OptArg != "" {
+				t.Errorf("optarg is '%s'. Expected ''.\n", getoptlong.OptArg)
 			}
 		}
 
-		if args[OptInd-1] != "-a" {
-			t.Errorf("last argument is '%s'. Expected '-a'.\n", args[OptInd-1])
+		if args[getoptlong.OptInd-1] != "-a" {
+			t.Errorf("last argument is '%s'. Expected '-a'.\n", args[getoptlong.OptInd-1])
 		}
 	})
 
@@ -775,8 +775,8 @@ func TestShortOptions(t *testing.T) {
 		args := []string{"getoptlong_test.go", "-a"}
 		r, w, _ := os.Pipe()
 		oldStderr := os.Stderr
-		longopts := []Option{
-			{Name: "", HasArg: NoArgument, Flag: nil, Val: 0},
+		longopts := []getoptlong.Option{
+			{Name: "", HasArg: getoptlong.NoArgument, Flag: nil, Val: 0},
 		}
 		var opt int
 
@@ -785,7 +785,7 @@ func TestShortOptions(t *testing.T) {
 		os.Stderr = w
 
 		for {
-			opt = GetoptLong(len(args), args, "a:", longopts, nil)
+			opt = getoptlong.Parse(len(args), args, "a:", longopts, nil)
 
 			if opt == -1 {
 				break
@@ -805,27 +805,27 @@ func TestShortOptions(t *testing.T) {
 				t.Errorf("stderr is '%s'. Expected 'getoptlong_test.go: option requires an argument -- 'a''.\n", stderr)
 			}
 
-			if OptArg != "" {
-				t.Errorf("optarg is '%s'. Expected ''.\n", OptArg)
+			if getoptlong.OptArg != "" {
+				t.Errorf("optarg is '%s'. Expected ''.\n", getoptlong.OptArg)
 			}
 		}
 
-		if args[OptInd-1] != "-a" {
-			t.Errorf("last argument is '%s'. Expected '-a'.\n", args[OptInd-1])
+		if args[getoptlong.OptInd-1] != "-a" {
+			t.Errorf("last argument is '%s'. Expected '-a'.\n", args[getoptlong.OptInd-1])
 		}
 	})
 
 	t.Run("Expects required argument passed optional argument", func(t *testing.T) {
 		args := []string{"", "-afoo", "bar"}
-		longopts := []Option{
-			{Name: "", HasArg: NoArgument, Flag: nil, Val: 0},
+		longopts := []getoptlong.Option{
+			{Name: "", HasArg: getoptlong.NoArgument, Flag: nil, Val: 0},
 		}
 		var opt int
 
 		t.Cleanup(func() { cleanup(t) })
 
 		for {
-			opt = GetoptLong(len(args), args, "a:", longopts, nil)
+			opt = getoptlong.Parse(len(args), args, "a:", longopts, nil)
 
 			if opt == -1 {
 				break
@@ -835,27 +835,27 @@ func TestShortOptions(t *testing.T) {
 				t.Errorf("opt is '%c'. Expected '?'.\n", opt)
 			}
 
-			if OptArg != "foo" {
-				t.Errorf("optarg is '%s'. Expected 'foo'.\n", OptArg)
+			if getoptlong.OptArg != "foo" {
+				t.Errorf("optarg is '%s'. Expected 'foo'.\n", getoptlong.OptArg)
 			}
 		}
 
-		if args[OptInd] != "bar" {
-			t.Errorf("positional argument is '%s'. Expected 'bar'.\n", args[OptInd])
+		if args[getoptlong.OptInd] != "bar" {
+			t.Errorf("positional argument is '%s'. Expected 'bar'.\n", args[getoptlong.OptInd])
 		}
 	})
 
 	t.Run("Expects required argument passed required argument", func(t *testing.T) {
 		args := []string{"", "-a", "foo", "bar"}
-		longopts := []Option{
-			{Name: "", HasArg: NoArgument, Flag: nil, Val: 0},
+		longopts := []getoptlong.Option{
+			{Name: "", HasArg: getoptlong.NoArgument, Flag: nil, Val: 0},
 		}
 		var opt int
 
 		t.Cleanup(func() { cleanup(t) })
 
 		for {
-			opt = GetoptLong(len(args), args, "a:", longopts, nil)
+			opt = getoptlong.Parse(len(args), args, "a:", longopts, nil)
 
 			if opt == -1 {
 				break
@@ -865,13 +865,13 @@ func TestShortOptions(t *testing.T) {
 				t.Errorf("opt is '%c'. Expected '?'.\n", opt)
 			}
 
-			if OptArg != "foo" {
-				t.Errorf("optarg is '%s'. Expected 'foo'.\n", OptArg)
+			if getoptlong.OptArg != "foo" {
+				t.Errorf("optarg is '%s'. Expected 'foo'.\n", getoptlong.OptArg)
 			}
 		}
 
-		if args[OptInd] != "bar" {
-			t.Errorf("positional argument is '%s'. Expected 'bar'.\n", args[OptInd])
+		if args[getoptlong.OptInd] != "bar" {
+			t.Errorf("positional argument is '%s'. Expected 'bar'.\n", args[getoptlong.OptInd])
 		}
 	})
 }
