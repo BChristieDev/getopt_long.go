@@ -56,34 +56,25 @@ var (
 	nextchar = 0
 )
 
-func errInvalidOpt(optopt int, errMsg string) int {
-	OptInd++
+func errInvalidOpt(optopt int, errMsg string, colon int) int {
 	OptOpt = optopt
+	OptInd++
 	nextchar = 0
 
-	if OptErr != 0 {
-		fmt.Fprintln(os.Stderr, errMsg)
+	if OptErr == 0 {
+		if colon == 1 {
+			return ':'
+		}
+
+		return '?'
 	}
+
+	fmt.Fprintln(os.Stderr, errMsg)
 
 	return '?'
 }
 
-func errRequiresArg(optopt int, errMsg string) int {
-	OptOpt = optopt
-
-	if OptErr != 0 {
-		fmt.Fprintln(os.Stderr, errMsg)
-		return '?'
-	}
-
-	return ':'
-}
-
-func parseArg(argc int, argv []string, hasArg int, optargind int, opt int, errMsg string) int {
-	if hasArg == RequiredArgument && optargind <= 0 && OptInd >= argc {
-		return errRequiresArg(opt, errMsg)
-	}
-
+func parseArg(argv []string, hasArg int, optargind int) {
 	if hasArg == RequiredArgument || (hasArg == OptionalArgument && optargind > 0) {
 		OptArg = argv[OptInd][optargind:]
 		OptInd++
@@ -91,8 +82,6 @@ func parseArg(argc int, argv []string, hasArg int, optargind int, opt int, errMs
 	} else {
 		OptArg = ""
 	}
-
-	return 0
 }
 
 func parseLongOpt(argc int, argv []string, longopts []Option, indexptr *int) int {
@@ -109,40 +98,45 @@ func parseLongOpt(argc int, argv []string, longopts []Option, indexptr *int) int
 	optarrind := common.FindIndex(longopts, func(longopt Option) bool { return longopt.Name == opt })
 
 	if optarrind == -1 {
-		return errInvalidOpt(0, fmt.Sprintf("%s: unrecognized option '--%s'", progname, opt))
-	}
-
-	if longopts[optarrind].HasArg <= NoArgument || longopts[optarrind].HasArg > OptionalArgument || eq == -1 {
-		OptInd++
+		return errInvalidOpt(0, fmt.Sprintf("%s: unrecognized option '--%s'", progname, opt), 0)
 	}
 
 	if indexptr != nil {
 		*indexptr = optarrind
 	}
 
-	err := parseArg(argc, argv, longopts[optarrind].HasArg, eq+1, 0, fmt.Sprintf("%s: option '--%s' requires an argument", progname, opt))
-
-	if err != 0 {
-		return err
+	if eq >= 0 {
+		if longopts[optarrind].HasArg <= NoArgument || longopts[optarrind].HasArg > OptionalArgument {
+			return errInvalidOpt(0, fmt.Sprintf("%s: option '--%s' doesn't allow an argument", progname, opt), 0)
+		}
+	} else {
+		OptInd++
 	}
 
-	if longopts[optarrind].Flag == nil {
-		return longopts[optarrind].Val
+	if longopts[optarrind].HasArg == RequiredArgument && OptInd >= argc {
+		return errInvalidOpt(0, fmt.Sprintf("%s: option '--%s' requires an argument", progname, opt), 1)
 	}
 
-	*longopts[optarrind].Flag = longopts[optarrind].Val
+	parseArg(argv, longopts[optarrind].HasArg, eq+1)
 
-	return 0
+	if longopts[optarrind].Flag != nil {
+		*longopts[optarrind].Flag = longopts[optarrind].Val
+		OptOpt = 0
+
+		return 0
+	}
+
+	return longopts[optarrind].Val
 }
 
 func parseShortOpt(argc int, argv []string, shortopts string) int {
 	progname := filepath.Base(argv[0])
 	opt := int(argv[OptInd][nextchar])
-	optstrind := strings.Index(shortopts, string(rune(opt)))
-	var hasArg int
+	optstrind := strings.Index(shortopts, argv[OptInd][nextchar:nextchar+1])
+	hasArg := NoArgument
 
 	if optstrind == -1 {
-		return errInvalidOpt(opt, fmt.Sprintf("%s: invalid option -- '%c'", progname, opt))
+		return errInvalidOpt(opt, fmt.Sprintf("%s: invalid option -- '%c'", progname, opt), 0)
 	}
 
 	nextchar++
@@ -156,15 +150,13 @@ func parseShortOpt(argc int, argv []string, shortopts string) int {
 		hasArg = OptionalArgument
 	} else if common.CharAt(shortopts, optstrind+1) == ":" && common.CharAt(shortopts, optstrind+2) != ":" {
 		hasArg = RequiredArgument
-	} else {
-		hasArg = NoArgument
 	}
 
-	err := parseArg(argc, argv, hasArg, nextchar, opt, fmt.Sprintf("%s: option requires an argument -- '%c'", progname, opt))
-
-	if err != 0 {
-		return err
+	if hasArg == RequiredArgument && OptInd >= argc {
+		return errInvalidOpt(opt, fmt.Sprintf("%s: option requires an argument -- '%c'", progname, opt), 1)
 	}
+
+	parseArg(argv, hasArg, nextchar)
 
 	return opt
 }
