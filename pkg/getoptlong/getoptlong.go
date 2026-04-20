@@ -24,8 +24,8 @@ type Option struct {
 	*/
 	HasArg int
 	/*
-		Specifies how results are returned for a long option. If Flag is not nil, then GetoptLong
-		returns 0 and Val will be assigned to the integer Flag is pointing to, otherwise GetoptLong
+		Specifies how results are returned for a long option. If Flag is not nil, then getoptlong.Parse
+		returns 0 and Val will be assigned to the integer Flag is pointing to, otherwise getoptlong.Parse
 		returns Val.
 	*/
 	Flag *int
