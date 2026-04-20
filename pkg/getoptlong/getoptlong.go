@@ -50,7 +50,9 @@ var (
 	/* Error reporting flag, set to 0 to suppress default error messages; default 1 */
 	OptErr = 1
 	/* Stores option that causes an error. */
-	OptOpt   = 0
+	OptOpt = 0
+	/* Resets parser's internal state */
+	OptReset = 0
 	nextchar = 0
 )
 
@@ -185,6 +187,11 @@ func Parse(argc int, argv []string, shortopts string, longopts []Option, indexpt
 
 	if OptInd == 0 {
 		OptInd = 1
+		OptReset = 1
+	}
+
+	if OptReset == 1 {
+		OptReset = 0
 		nextchar = 0
 	}
 
