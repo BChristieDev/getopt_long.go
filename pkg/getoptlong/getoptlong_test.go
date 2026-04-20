@@ -218,13 +218,17 @@ func TestLongOptions(t *testing.T) {
 	})
 
 	t.Run("Expects no argument passed optional argument", func(t *testing.T) {
-		args := []string{"", "--foo=bar", "baz"}
+		args := []string{"getoptlong_test.go", "--foo=bar", "baz"}
+		r, w, _ := os.Pipe()
+		oldStderr := os.Stderr
 		longopts := []getoptlong.Option{
 			{Name: "foo", HasArg: getoptlong.NoArgument, Flag: nil, Val: 0},
 		}
 		var opt int
 
 		t.Cleanup(func() { cleanup(t) })
+
+		os.Stderr = w
 
 		for {
 			opt = getoptlong.Parse(len(args), args, "", longopts, nil)
@@ -233,8 +237,18 @@ func TestLongOptions(t *testing.T) {
 				break
 			}
 
-			if opt != 0 {
-				t.Errorf("opt is '%c'. Expected '0'.\n", opt)
+			w.Close()
+			regex := regexp.MustCompile("[\r\n]")
+			stderr, _ := io.ReadAll(r)
+			stderr = regex.ReplaceAll(stderr, nil)
+			os.Stderr = oldStderr
+
+			if opt != '?' {
+				t.Errorf("opt is '%c'. Expected '?'.\n", opt)
+			}
+
+			if string(stderr) != "getoptlong_test.go: option '--foo' doesn't allow an argument" {
+				t.Errorf("stderr is '%s'. Expected 'getoptlong_test.go: option '--foo' doesn't allow an argument'.\n", stderr)
 			}
 
 			if getoptlong.OptArg != "" {
