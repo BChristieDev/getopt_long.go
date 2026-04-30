@@ -178,7 +178,7 @@ is pointing to. If indexptr is not nil, then the index of the long option in lon
 the integer indexptr is pointing to.
 
 If an unrecognized option is encountered '?' is returned. If an option with a missing argument is
-encountered '?' is returned with OptErr is is non-zero, otherwise ':' is returned.
+encountered '?' is returned if OptErr is non-zero, otherwise ':' is returned.
 
 If all options are parsed -1 is returned.
 */

@@ -24,6 +24,7 @@ func main() {
 	}
 
 	frob_flag := frob_state.unset
+	var longindex, opt int
 
 	longopts := []getoptlong.Option{
 		{Name: "foo", HasArg: getoptlong.NoArgument, Flag: nil, Val: 'a'},
@@ -33,8 +34,6 @@ func main() {
 		{Name: "off", HasArg: getoptlong.NoArgument, Flag: &frob_flag, Val: frob_state.off},
 		{Name: "silent", HasArg: getoptlong.NoArgument, Flag: nil, Val: 's'},
 	}
-
-	var longindex, opt int
 
 	for {
 		opt = getoptlong.Parse(len(os.Args), os.Args, "ab::c:", longopts, &longindex)

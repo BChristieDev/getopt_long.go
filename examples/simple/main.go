@@ -13,11 +13,11 @@ import (
 )
 
 func main() {
+	var longindex, opt int
+
 	longopts := []getoptlong.Option{
 		{Name: "foo", HasArg: getoptlong.RequiredArgument, Flag: nil, Val: 0},
 	}
-
-	var longindex, opt int
 
 	for {
 		opt = getoptlong.Parse(len(os.Args), os.Args, "a:", longopts, &longindex)
