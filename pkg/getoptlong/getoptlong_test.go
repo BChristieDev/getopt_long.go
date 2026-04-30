@@ -217,6 +217,51 @@ func TestLongOptions(t *testing.T) {
 		}
 	})
 
+	t.Run("Expects no argument passed optional argument silent", func(t *testing.T) {
+		args := []string{"getoptlong_test.go", "--foo=bar", "baz"}
+		r, w, _ := os.Pipe()
+		oldStderr := os.Stderr
+		longopts := []getoptlong.Option{
+			{Name: "foo", HasArg: getoptlong.NoArgument, Flag: nil, Val: 0},
+		}
+		var opt int
+
+		t.Cleanup(func() { cleanup(t) })
+
+		os.Stderr = w
+		getoptlong.OptErr = 0
+
+		for {
+			opt = getoptlong.Parse(len(args), args, "", longopts, nil)
+
+			if opt == -1 {
+				break
+			}
+
+			w.Close()
+			regex := regexp.MustCompile("[\r\n]")
+			stderr, _ := io.ReadAll(r)
+			stderr = regex.ReplaceAll(stderr, nil)
+			os.Stderr = oldStderr
+
+			if opt != '?' {
+				t.Errorf("opt is '%c'. Expected '?'.\n", opt)
+			}
+
+			if string(stderr) != "" {
+				t.Errorf("stderr is '%s'. Expected ''.\n", stderr)
+			}
+
+			if getoptlong.OptArg != "" {
+				t.Errorf("optarg is '%s'. Expected ''.\n", getoptlong.OptArg)
+			}
+		}
+
+		if args[getoptlong.OptInd] != "baz" {
+			t.Errorf("positional argument is '%s'. Expected 'baz'.\n", args[getoptlong.OptInd])
+		}
+	})
+
 	t.Run("Expects no argument passed optional argument", func(t *testing.T) {
 		args := []string{"getoptlong_test.go", "--foo=bar", "baz"}
 		r, w, _ := os.Pipe()
