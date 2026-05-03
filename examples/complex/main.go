@@ -36,7 +36,7 @@ func main() {
 	}
 
 	for {
-		opt = getoptlong.Parse(len(os.Args), os.Args, "ab::c:", longopts, &longindex)
+		opt = getoptlong.Parse(len(os.Args), os.Args, "ab::c:s", longopts, &longindex)
 
 		if opt == -1 {
 			break
