@@ -58,7 +58,7 @@ var (
 
 func errInvalidOpt(msg string, colon int) int {
 	if OptErr == 0 {
-		if colon == 1 {
+		if colon != 0 {
 			return ':'
 		}
 
@@ -192,7 +192,7 @@ func Parse(argc int, argv []string, shortopts string, longopts []Option, indexpt
 		OptReset = 1
 	}
 
-	if OptReset == 1 {
+	if OptReset != 0 {
 		OptReset = 0
 		nextchar = 0
 	}
